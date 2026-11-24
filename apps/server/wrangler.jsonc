@@ -1,0 +1,45 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "study-platform",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-09-01",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"observability": {
+		"enabled": true
+	},
+	"assets": {
+		// apps/web の `vite build` 出力。turbo の build 依存 (turbo.json) により
+		// server:build の前に web:build が完了している前提。
+		"directory": "../web/dist",
+		"not_found_handling": "single-page-application",
+		// /api/* は常に Worker (Hono) にルーティングし、それ以外は静的アセットを配信する。
+		"run_worker_first": [
+			"/api/*"
+		]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "study-platform-db",
+			// Replace with the id printed by `wrangler d1 create study-platform-db`.
+			"database_id": "6d425e0d-2c51-4df6-8b11-7bb8de7ea591",
+			"migrations_dir": "migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			// 教材ファイル (files/...) と Markdown 用画像 (images/...) の保存先
+			"binding": "BUCKET",
+			"bucket_name": "study-platform-files"
+		}
+	],
+	"vars": {
+		// 管理者 (教材・テストを編集できる) とみなす Discord ロール ID (カンマ区切り)
+		"DISCORD_ADMIN_ROLE_IDS": "1130034417834917891,1472865253179261013"
+	}
+	// シークレット (wrangler secret put で設定):
+	//   DISCORD_CLIENT_ID / DISCORD_CLIENT_SECRET / DISCORD_GUILD_ID
+	// ローカルでは .dev.vars に記述 (.dev.vars.example 参照)
+}

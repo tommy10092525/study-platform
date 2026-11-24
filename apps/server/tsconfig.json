@@ -1,0 +1,7 @@
+{
+  "extends": "@repo/typescript-config/workers.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": ["src", "drizzle.config.ts"]
+}
