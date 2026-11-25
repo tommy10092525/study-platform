@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { ErrorText, Loading, Textarea } from "@/components/ui/misc";
 import { useAuth } from "@/hooks/use-auth";
 import { client, ensureOk } from "@/lib/api";
+import { handleTabIndent } from "@/lib/textarea-indent";
 import { cn } from "@/lib/utils";
 import { useDocument } from "./DocumentView";
 
@@ -184,6 +185,12 @@ export function DocumentEdit() {
             setMarkdown(e.target.value);
             setDirty(true);
           }}
+          onKeyDown={(e) =>
+            handleTabIndent(e, (v) => {
+              setMarkdown(v);
+              setDirty(true);
+            })
+          }
           onPaste={(e) => {
             if (handleFiles(e.clipboardData.files)) e.preventDefault();
           }}
