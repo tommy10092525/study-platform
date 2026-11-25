@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, ErrorText, Label, Loading, Textarea } from "@/components/ui/misc";
 import { useAuth } from "@/hooks/use-auth";
 import { client, ensureOk } from "@/lib/api";
+import { handleTabIndent } from "@/lib/textarea-indent";
 
 type Draft = {
   key: string;
@@ -173,6 +174,7 @@ export function QuizEdit() {
               id={`${d.key}-prompt`}
               value={d.prompt}
               onChange={(e) => update(d.key, { prompt: e.target.value })}
+              onKeyDown={(e) => handleTabIndent(e, (v) => update(d.key, { prompt: v }))}
               placeholder="例: Python で標準出力に文字列を表示する関数は？"
             />
             <Label htmlFor={`${d.key}-answers`}>正解 (1 行に 1 つ。いずれかに一致すれば正解)</Label>
@@ -199,6 +201,7 @@ export function QuizEdit() {
               id={`${d.key}-exp`}
               value={d.explanation}
               onChange={(e) => update(d.key, { explanation: e.target.value })}
+              onKeyDown={(e) => handleTabIndent(e, (v) => update(d.key, { explanation: v }))}
             />
           </Card>
         ))}
