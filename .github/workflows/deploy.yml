@@ -1,0 +1,43 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 同時に複数のデプロイが走らないようにする (後から来た push を待たせる)
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # バージョンは package.json の packageManager (pnpm@10.30.3) から読み取る
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # 本番 D1 に未適用のマイグレーションを適用 (適用済みならスキップされる)
+      - name: Apply D1 migrations
+        working-directory: apps/server
+        run: pnpm exec wrangler d1 migrations apply study-platform-db --remote
+
+      # turbo run deploy: web#build → server#build → wrangler deploy --minify
+      - name: Build and deploy
+        run: pnpm run build

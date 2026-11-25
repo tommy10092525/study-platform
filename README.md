@@ -174,3 +174,16 @@ pnpm build        # ↑ + wrangler deploy (本番の Worker を更新します)
 ```
 
 依存関係の詳細は `turbo.json` を参照してください。
+
+### 自動デプロイ (GitHub Actions)
+
+`main` への push で `.github/workflows/deploy.yml` が実行され、本番 D1 へのマイグレーション適用 → ビルド → `wrangler deploy` を行います (Actions タブから手動実行も可)。
+
+リポジトリの **Settings → Secrets and variables → Actions** に以下を登録してください。
+
+| Secret | 内容 |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare の API トークン。「Edit Cloudflare Workers」テンプレートに **D1: Edit** 権限を追加して作成 |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare のアカウント ID (ダッシュボードの Workers & Pages 画面などに表示) |
+
+Discord 関連のシークレットは `wrangler secret put` で Worker 側に設定済みのものがそのまま使われます。
